@@ -1,6 +1,7 @@
 /**
- * main.js — GLB + first-person navigation with floor/wall collision
- * Mouse steers. Camera auto-walks. Click to pause/resume.
+ * main.js — BLV Navigation Demo
+ * First-person walkthrough with proximity ring hazard system.
+ * Mouse steers. Click to pause/resume.
  */
 
 import * as THREE from 'three';
@@ -8,6 +9,7 @@ import { createScene }               from './src/core/scene.js';
 import { loadStation }               from './src/core/loader.js';
 import { createFirstPersonControls } from './src/simulation/firstperson.js';
 import { createCompass }             from './src/ui/compass.js';
+import { createProximityRing }       from './src/hazards/ProximityRing.js';
 
 async function init() {
   const container = document.getElementById('canvas-container');
@@ -35,14 +37,15 @@ async function init() {
 
   try {
     const result = await loadStation(scene, camera);
-    meshes     = result.meshes;
-    modelSize  = result.modelSize;
+    meshes    = result.meshes;
+    modelSize = result.modelSize;
   } catch (err) {
     console.error('[main] GLB failed:', err);
   }
 
-  // Give the controls the mesh list so raycasting works
   fp.setMeshes(meshes, modelSize);
+
+  const proximityRing = createProximityRing(scene, meshes);
 
   const loaderEl = document.getElementById('loader');
   loaderEl.classList.add('hidden');
@@ -51,8 +54,12 @@ async function init() {
   const clock = new THREE.Clock();
   function animate() {
     requestAnimationFrame(animate);
-    fp.update(clock.getDelta());
+    const delta = clock.getDelta();
+
+    fp.update(delta);
+    proximityRing.update(delta, camera.position);
     compass.update(fp.getMouseAngle());
+
     renderer.render(scene, camera);
   }
   animate();
