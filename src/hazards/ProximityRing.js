@@ -27,7 +27,7 @@ export function createProximityRing(scene, meshes) {
   const ring = new THREE.Mesh(
     new THREE.RingGeometry(ringRadius - 0.07, ringRadius, 64),
     new THREE.MeshBasicMaterial({
-      color:       0xff88aa,
+      color:       0x00E5FF,
       transparent: true,
       opacity:     0.65,
       side:        THREE.DoubleSide,
@@ -68,7 +68,7 @@ export function createProximityRing(scene, meshes) {
   function spawnIndicator(hitPoint, floorY) {
     const sphere = new THREE.Mesh(
       new THREE.SphereGeometry(0.18, 8, 8),
-      new THREE.MeshBasicMaterial({ color: 0xff44aa, transparent: true, opacity: 1.0 })
+      new THREE.MeshBasicMaterial({ color: 0x00E5FF, transparent: true, opacity: 1.0 })
     );
     sphere.position.set(hitPoint.x, floorY + 0.25, hitPoint.z);
     sphere.renderOrder = 10;
