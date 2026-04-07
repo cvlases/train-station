@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BLV Navigation Demo — Train Station</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #0a0c10;
+        overflow: hidden;
+        font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      }
+
+      canvas {
+        display: block;
+      }
+
+      /* ── Overlay UI ──────────────────────────────────────────── */
+      #ui-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      #legend {
+        position: absolute;
+        bottom: 32px;
+        left: 32px;
+        background: rgba(10, 12, 16, 0.82);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 16px 20px;
+        min-width: 260px;
+      }
+
+      #legend h3 {
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.35);
+        margin-bottom: 14px;
+      }
+
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 9px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .legend-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .legend-arc {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: 2px solid #f59e0b;
+        flex-shrink: 0;
+        background: transparent;
+      }
+
+      #tagline {
+        margin-top: 14px;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.07);
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.3);
+        line-height: 1.5;
+        letter-spacing: 0.03em;
+      }
+
+      /* ── Sensor tooltip ──────────────────────────────────────── */
+      #sensor-tooltip {
+        position: absolute;
+        background: rgba(10, 12, 16, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 5px;
+        padding: 6px 10px;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.8);
+        pointer-events: none;
+        display: none;
+        white-space: nowrap;
+        letter-spacing: 0.04em;
+      }
+
+      /* ── Loading screen ──────────────────────────────────────── */
+      #loader {
+        position: fixed;
+        inset: 0;
+        background: #0a0c10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        z-index: 100;
+        transition: opacity 0.6s ease;
+      }
+
+      #loader.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      #loader span {
+        font-size: 11px;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.35);
+      }
+
+      .loader-bar {
+        width: 180px;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 1px;
+        overflow: hidden;
+      }
+
+      .loader-fill {
+        height: 100%;
+        width: 0%;
+        background: rgba(255, 255, 255, 0.4);
+        animation: load 1.8s ease forwards;
+      }
+
+      @keyframes load {
+        to { width: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading screen -->
+    <div id="loader">
+      <span>Loading station model</span>
+      <div class="loader-bar"><div class="loader-fill"></div></div>
+    </div>
+
+    <!-- Three.js canvas mounts here -->
+    <div id="canvas-container"></div>
+
+    <!-- UI overlay (legend, tooltip) -->
+    <div id="ui-overlay">
+      <div id="legend">
+        <h3>Sensor Legend</h3>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#3b82f6;box-shadow:0 0 6px #3b82f6;"></div>
+          <span>BLE — Short range, blocked by concrete</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#eab308;box-shadow:0 0 6px #eab308;"></div>
+          <span>RTT WiFi — Wide coverage anchor</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#f97316;box-shadow:0 0 6px #f97316;"></div>
+          <span>UWB — Precision, high-risk zones</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-arc"></div>
+          <span>Spatial audio feedback zone</span>
+        </div>
+        <div id="tagline">
+          Simulating spatial audio navigation for BLV users
+        </div>
+      </div>
+
+      <div id="sensor-tooltip"></div>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
